@@ -1,6 +1,7 @@
 import argparse
 import os
 import binascii
+from typing import List
 
 
 class Constants:
@@ -38,30 +39,46 @@ class DrunkenBishopGenerator:
         self.board = [[0] * self.num_col for _ in range(self.num_row)]
 
     def moveUpLeft(self):
+        """
+        Move current position up and left
+        """
         if self.curr_col > 0:
             self.curr_col -= 1
         if self.curr_row > 0:
             self.curr_row -= 1
 
     def moveUpRight(self):
+        """
+        Move current position up and right
+        """
         if self.curr_col < self.num_col - 1:
             self.curr_col += 1
         if self.curr_row > 0:
             self.curr_row -= 1
 
     def moveDownLeft(self):
+        """
+        Move current position down and left
+        """
         if self.curr_col > 0:
             self.curr_col -= 1
         if self.curr_row < self.num_row - 1:
             self.curr_row += 1
 
     def moveDownRight(self):
+        """
+        Move current position down and right
+        """
         if self.curr_col < self.num_col - 1:
             self.curr_col += 1
         if self.curr_row < self.num_row - 1:
             self.curr_row += 1
 
-    def generateAscii(self, fingerprint, random=False):
+    def generateAscii(self, fingerprint: str, random: bool = False):
+        """
+        Generate ASCII representation
+        If random is True, generate a random key
+        """
         if random:
             fingerprint = self.generateRandomKey()
 
@@ -102,7 +119,11 @@ class DrunkenBishopGenerator:
         self.prettyPrint(fingerprint, ascii_board)
         self.resetBoard()
 
-    def readBoard(self, start_x, start_y, end_x, end_y):
+    def readBoard(self, start_x: int, start_y: int, end_x: int, end_y: int):
+        """
+        Convert board to characters based on frequency of visits
+        Start and end points reserved for "S" and "E"
+        """
         ascii_board = [[""] * self.num_col for _ in range(self.num_row)]
         for i in range(0, self.num_row):
             for j in range(0, self.num_col):
@@ -114,7 +135,10 @@ class DrunkenBishopGenerator:
 
         return self.formatBoard(ascii_board)
 
-    def formatBoard(self, ascii_board):
+    def formatBoard(self, ascii_board: List[str]):
+        """
+        Add bordering for ASCII board
+        """
         formatted_board = "+" + "-" * (self.num_col) + "+\n"
         for ascii_row in ascii_board:
             formatted_board += "|" + "".join(ascii_row) + "|\n"
@@ -122,27 +146,36 @@ class DrunkenBishopGenerator:
         return formatted_board
 
     def resetBoard(self):
+        """
+        Reset frequency and position of board 
+        """
         self.board = [[0] * self.num_col for _ in range(self.num_row)]
         self.curr_col = Constants.START_COL
         self.curr_row = Constants.START_ROW
 
     def prettyPrint(self, fingerprint, ascii_board):
+        """
+        Format print statement for user 
+        """
         res = "Fingerprint:\n{fingerprint}\n{ascii}".format(
             fingerprint=fingerprint, ascii=ascii_board
         )
         print(res)
 
     def generateRandomKey(self):
+        """
+        Generate a random 16 octet key 
+        """
         random_bytes = []
         for _ in range(0, Constants.NUM_HEX_BYTES):
             random_bytes.append(binascii.b2a_hex(os.urandom(1)).decode("utf-8"))
         return ":".join(random_bytes)
 
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Convert a key to ASCII representation via Drunken Bishop algorithm."
-    )
+def initializeParser():
+    """
+    Initialize parser arguments 
+    """
+    parser = argparse.ArgumentParser(description="Convert a key to ASCII representation via Drunken Bishop algorithm.")
     parser.add_argument(
         "-k",
         "--key",
@@ -158,6 +191,10 @@ def main():
         help="generate random key for ASCII representation",
         action="store_true",
     )
+    return parser
+
+def main():
+    parser = initializeParser()
     args = parser.parse_args()
 
     generator = DrunkenBishopGenerator()
