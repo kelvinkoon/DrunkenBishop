@@ -52,4 +52,4 @@ b4:bb:ed:62:0a:75:d1:a6:eb:09:bf:9d:8b:b7:ee:c3
 
 #### Demo
 
-Repl demo link coming soon.
+A [replit](https://replit.com/@kelvinkoon/DrunkenBishop#README.md) is available for you to try using the Shell.

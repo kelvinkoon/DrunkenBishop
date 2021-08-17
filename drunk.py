@@ -147,7 +147,7 @@ class DrunkenBishopGenerator:
 
     def resetBoard(self):
         """
-        Reset frequency and position of board 
+        Reset frequency and position of board
         """
         self.board = [[0] * self.num_col for _ in range(self.num_row)]
         self.curr_col = Constants.START_COL
@@ -155,7 +155,7 @@ class DrunkenBishopGenerator:
 
     def prettyPrint(self, fingerprint, ascii_board):
         """
-        Format print statement for user 
+        Format print statement for user
         """
         res = "Fingerprint:\n{fingerprint}\n{ascii}".format(
             fingerprint=fingerprint, ascii=ascii_board
@@ -164,18 +164,21 @@ class DrunkenBishopGenerator:
 
     def generateRandomKey(self):
         """
-        Generate a random 16 octet key 
+        Generate a random 16 octet key
         """
         random_bytes = []
         for _ in range(0, Constants.NUM_HEX_BYTES):
             random_bytes.append(binascii.b2a_hex(os.urandom(1)).decode("utf-8"))
         return ":".join(random_bytes)
 
+
 def initializeParser():
     """
-    Initialize parser arguments 
+    Initialize parser arguments
     """
-    parser = argparse.ArgumentParser(description="Convert a key to ASCII representation via Drunken Bishop algorithm.")
+    parser = argparse.ArgumentParser(
+        description="Convert a key to ASCII representation via Drunken Bishop algorithm."
+    )
     parser.add_argument(
         "-k",
         "--key",
@@ -192,6 +195,7 @@ def initializeParser():
         action="store_true",
     )
     return parser
+
 
 def main():
     parser = initializeParser()
