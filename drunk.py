@@ -2,10 +2,12 @@ import argparse
 import os
 import binascii
 
+
 class Constants:
     START_COL = 8
     START_ROW = 4
     NUM_HEX_BYTES = 16
+
 
 class DrunkenBishopGenerator:
     def __init__(self):
@@ -115,7 +117,7 @@ class DrunkenBishopGenerator:
     def formatBoard(self, ascii_board):
         formatted_board = "+" + "-" * (self.num_col) + "+\n"
         for ascii_row in ascii_board:
-            formatted_board += "|" + ''.join(ascii_row) + "|\n"
+            formatted_board += "|" + "".join(ascii_row) + "|\n"
         formatted_board += "+" + "-" * (self.num_col) + "+\n"
         return formatted_board
 
@@ -133,22 +135,29 @@ class DrunkenBishopGenerator:
     def generateRandomKey(self):
         random_bytes = []
         for _ in range(0, Constants.NUM_HEX_BYTES):
-            random_bytes.append(binascii.b2a_hex(os.urandom(1)).decode('utf-8'))
+            random_bytes.append(binascii.b2a_hex(os.urandom(1)).decode("utf-8"))
         return ":".join(random_bytes)
 
 
-"""
-TODOs:
-- Write 'random' function
-- Add function signatures
-"""
-
-
 def main():
-    parser = argparse.ArgumentParser(description="Convert a key to ASCII representation via Drunken Bishop algorithm.")
-    parser.add_argument("-k", "--key", metavar="key", nargs="?", const="", type=str, help="16 octet byte string")
-    parser.add_argument("-r", "--random", help="generate random key for ASCII representation",
-                    action="store_true")
+    parser = argparse.ArgumentParser(
+        description="Convert a key to ASCII representation via Drunken Bishop algorithm."
+    )
+    parser.add_argument(
+        "-k",
+        "--key",
+        metavar="key",
+        nargs="?",
+        const="",
+        type=str,
+        help="16 octet byte string",
+    )
+    parser.add_argument(
+        "-r",
+        "--random",
+        help="generate random key for ASCII representation",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     generator = DrunkenBishopGenerator()
