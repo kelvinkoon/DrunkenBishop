@@ -157,10 +157,11 @@ class DrunkenBishopGenerator:
         """
         Format print statement for user
         """
-        res = "Fingerprint:\n{fingerprint}\n{ascii}".format(
-            fingerprint=fingerprint, ascii=ascii_board
+        print(
+            "Fingerprint:\n{fingerprint}\n{ascii}".format(
+                fingerprint=fingerprint, ascii=ascii_board
+            )
         )
-        print(res)
 
     def generateRandomKey(self):
         """
