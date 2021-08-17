@@ -1,13 +1,17 @@
-class CoordinateConstants:
+import argparse
+import os
+import binascii
+
+class Constants:
     START_COL = 8
     START_ROW = 4
-
+    NUM_HEX_BYTES = 16
 
 class DrunkenBishopGenerator:
     def __init__(self):
         # "S" and "E" reserved for start and end points
         self.freq_to_val = {
-            0: "",
+            0: " ",
             1: ".",
             2: "o",
             3: "+",
@@ -27,8 +31,8 @@ class DrunkenBishopGenerator:
         }
         self.num_col = 17
         self.num_row = 9
-        self.curr_col = CoordinateConstants.START_COL
-        self.curr_row = CoordinateConstants.START_ROW
+        self.curr_col = Constants.START_COL
+        self.curr_row = Constants.START_ROW
         self.board = [[0] * self.num_col for _ in range(self.num_row)]
 
     def moveUpLeft(self):
@@ -55,15 +59,20 @@ class DrunkenBishopGenerator:
         if self.curr_row < self.num_row - 1:
             self.curr_row += 1
 
-    def generateAscii(self, fingerprint):
-        # TODO: Ensure fingerprint is valid hexidecimal format
+    def generateAscii(self, fingerprint, random=False):
+        if random:
+            fingerprint = self.generateRandomKey()
+
+        # Validate byte string format
+        if len(fingerprint.split(":")) != Constants.NUM_HEX_BYTES:
+            raise ValueError("Hexidecimal byte string should have 16 octets.")
 
         # Parse fingerprint to bytes
         fp_bytes = fingerprint.split(":")
         for fp_byte in fp_bytes:
             # Convert from hex to binary
             bits = bin(int(fp_byte, 16))[2:].zfill(8)
-            # Convert pair bits to steps
+            # Convert pair bits to steps from LSB
             for i in range(len(bits), 1, -2):
                 step = bits[i - 2 : i]
                 if step == "00":
@@ -83,8 +92,8 @@ class DrunkenBishopGenerator:
                 self.board[self.curr_row][self.curr_col] += 1
 
         ascii_board = self.readBoard(
-            CoordinateConstants.START_COL,
-            CoordinateConstants.START_ROW,
+            Constants.START_COL,
+            Constants.START_ROW,
             self.curr_col,
             self.curr_row,
         )
@@ -100,14 +109,20 @@ class DrunkenBishopGenerator:
         # Mark beginning and end points
         ascii_board[start_y][start_x] = "S"
         ascii_board[end_y][end_x] = "E"
-        return "\n".join(
-            ["".join(["{:4}".format(item) for item in row]) for row in ascii_board]
-        )
+
+        return self.formatBoard(ascii_board)
+
+    def formatBoard(self, ascii_board):
+        formatted_board = "+" + "-" * (self.num_col) + "+\n"
+        for ascii_row in ascii_board:
+            formatted_board += "|" + ''.join(ascii_row) + "|\n"
+        formatted_board += "+" + "-" * (self.num_col) + "+\n"
+        return formatted_board
 
     def resetBoard(self):
         self.board = [[0] * self.num_col for _ in range(self.num_row)]
-        self.curr_col = CoordinateConstants.START_COL
-        self.curr_row = CoordinateConstants.START_ROW
+        self.curr_col = Constants.START_COL
+        self.curr_row = Constants.START_ROW
 
     def prettyPrint(self, fingerprint, ascii_board):
         res = "Fingerprint:\n{fingerprint}\n{ascii}".format(
@@ -115,20 +130,29 @@ class DrunkenBishopGenerator:
         )
         print(res)
 
+    def generateRandomKey(self):
+        random_bytes = []
+        for _ in range(0, Constants.NUM_HEX_BYTES):
+            random_bytes.append(binascii.b2a_hex(os.urandom(1)).decode('utf-8'))
+        return ":".join(random_bytes)
+
 
 """
 TODOs:
-- Validate fingerprint input
-- Parse CLI args
 - Write 'random' function
 - Add function signatures
 """
 
 
 def main():
-    test_fp = "37:e4:6a:2d:48:38:1a:0a:f3:72:6d:d9:17:6b:bd:5e"
+    parser = argparse.ArgumentParser(description="Convert a key to ASCII representation via Drunken Bishop algorithm.")
+    parser.add_argument("-k", "--key", metavar="key", nargs="?", const="", type=str, help="16 octet byte string")
+    parser.add_argument("-r", "--random", help="generate random key for ASCII representation",
+                    action="store_true")
+    args = parser.parse_args()
+
     generator = DrunkenBishopGenerator()
-    generator.generateAscii(test_fp)
+    generator.generateAscii(args.key, args.random)
 
 
 if __name__ == "__main__":
