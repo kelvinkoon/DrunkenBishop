@@ -82,10 +82,6 @@ class DrunkenBishopGenerator:
         if random:
             fingerprint = self.generateRandomKey()
 
-        # Validate byte string format
-        if len(fingerprint.split(":")) != Constants.NUM_HEX_BYTES:
-            raise ValueError("Hexidecimal byte string should have 16 octets.")
-
         # Parse fingerprint to bytes
         fp_bytes = fingerprint.split(":")
         for fp_byte in fp_bytes:
@@ -127,7 +123,12 @@ class DrunkenBishopGenerator:
         ascii_board = [[""] * self.num_col for _ in range(self.num_row)]
         for i in range(0, self.num_row):
             for j in range(0, self.num_col):
-                ascii_board[i][j] = self.freq_to_val[self.board[i][j]]
+                try:
+                    ascii_board[i][j] = self.freq_to_val[self.board[i][j]]
+                except KeyError:
+                    raise ValueError(
+                        "Frequency beyond accepted range, please check your input contains valid hexadecimal digits."
+                    )
 
         # Mark beginning and end points
         ascii_board[start_y][start_x] = "S"
@@ -198,11 +199,27 @@ def initializeParser():
     return parser
 
 
+def validate(key: str, random: bool):
+    """
+    Validate input
+    """
+    # No need to validate if random key generated
+    if random:
+        return
+
+    if not key:
+        raise ValueError("Key cannot be empty.")
+    # Validate byte string format
+    if len(key.split(":")) != Constants.NUM_HEX_BYTES:
+        raise ValueError("Hexidecimal byte string should have 16 octets.")
+
+
 def main():
     parser = initializeParser()
     args = parser.parse_args()
 
     generator = DrunkenBishopGenerator()
+    validate(args.key, args.random)
     generator.generateAscii(args.key, args.random)
 
 
